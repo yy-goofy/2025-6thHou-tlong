@@ -1,5 +1,5 @@
-#Name:
-#Class: 5th Hour
+#Name:Tristan long
+#Class: 6th Hour
 #Assignment: HW2
 
 #1. Print "Hello World!"
