@@ -1,0 +1,42 @@
+import turtle
+
+# Setup screen
+screen = turtle.Screen()
+screen.bgcolor("black")
+screen.title("Gojo Drawing")
+
+pen = turtle.Turtle()
+pen.speed(10)
+pen.color("white")
+
+# Draw Gojo's spiky hair
+pen.penup()
+pen.goto(-100,100)
+pen.pendown()
+for i in range(36):
+    pen.forward(200)
+    pen.backward(200)
+    pen.left(10)
+
+# Draw Gojo's head outline
+pen.penup()
+pen.goto(0,-100)
+pen.pendown()
+pen.circle(100)
+
+# Draw Gojo's blindfold
+pen.penup()
+pen.goto(-100,0)
+pen.pendown()
+pen.fillcolor("gray")
+pen.begin_fill()
+for _ in range(2):
+    pen.forward(200)
+    pen.left(90)
+    pen.forward(40)
+    pen.left(90)
+pen.end_fill()
+
+# Done
+pen.hideturtle()
+turtle.done()
