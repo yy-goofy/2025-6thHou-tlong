@@ -11,29 +11,57 @@
 
 #It is up to you to decide what properties are important and the theme of the game.
 
-enemy = {
-    "Beholder" : {
-        "HP":180,
-        "AC":18,
-        "dmg":36
+enemies = {
+    "Goblin": {
+        "health": 30,
+        "damage": 5,
+        "armor": 2,
+        "type": "ground"
     },
-    "dragon" : {
-        "HP":190,
-        "AC":21,
-        "dmg":45
+    "Orc": {
+        "health": 60,
+        "damage": 10,
+        "armor": 5,
+        "type": "ground"
     },
-    "goblin" : {
-        "HP":55,
-        "AC":7,
-        "dmg":6
+    "Troll": {
+        "health": 100,
+        "damage": 15,
+        "armor": 8,
+        "type": "ground"
     },
-    "giant spider" : {
-        "HP":160,
-        "AC":16,
-        "dmg":33
+    "Harpy": {
+        "health": 40,
+        "damage": 7,
+        "armor": 1,
+        "type": "flying"
     },
-    "orc " : {
-        "HP":160,
-        "AC":16,
-        "dmg":35
-    }}
+    "Dragon": {
+        "health": 200,
+        "damage": 25,
+        "armor": 12,
+        "type": "flying"
+    }
+}
+
+print("Current enemy stats:")
+for enemy, stats in enemies.items():
+    print(f"{enemy}: {stats}")
+
+print("\n--- Damage Update Tool ---")
+enemy_name = input("Enter the enemy name you want to adjust: ")
+
+if enemy_name in enemies:
+    try:
+        new_damage = int(input(f"Enter new damage value for {enemy_name}: "))
+        enemies[enemy_name]["damage"] = new_damage
+        print(f"\n✅ {enemy_name}'s damage updated successfully!")
+    except ValueError:
+        print("⚠️ Please enter a valid number for damage.")
+else:
+    print("⚠️ Enemy not found.")
+
+# Confirm updated dictionary
+print("\nUpdated enemy stats:")
+for enemy, stats in enemies.items():
+    print(f"{enemy}: {stats}")
