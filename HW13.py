@@ -20,3 +20,6 @@ while count <= 100:
     else:
         print(count)
     count += 1
+
+print("bot=IM DONE NOW.")
+print("tristan=THANK YOU FOR YOUR HARD WORK...")
