@@ -1,273 +1,200 @@
-"""
-1v1 Snake Game (Pygame)
-Controls:
-  Player 1: W A S D
-  Player 2: Arrow keys
-  R to restart
-  Esc or window close to quit
-"""
-
 import pygame
 import random
 import sys
 
-# --- Config ---
-CELL_SIZE = 20
-GRID_WIDTH = 32   # number of cells horizontally
-GRID_HEIGHT = 24  # number of cells vertically
-SCREEN_WIDTH = CELL_SIZE * GRID_WIDTH
-SCREEN_HEIGHT = CELL_SIZE * GRID_HEIGHT
-FPS = 10  # game speed (increase for faster)
+# Initialize pygame
+pygame.init()
+
+# Screen setup
+WIDTH, HEIGHT = 400, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Car Game")
 
 # Colors
 WHITE = (255, 255, 255)
+GRAY = (100, 100, 100)
+RED = (200, 0, 0)
+BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
-P1_COLOR = (50, 200, 50)     # green
-P2_COLOR = (200, 50, 50)     # red
-FOOD_COLOR = (255, 200, 0)   # yellow
-GRID_COLOR = (40, 40, 40)
-SCORE_COLOR = (200, 200, 200)
+GREEN = (0, 200, 0)
+LIGHT_GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
+LIGHT_GRAY = (180, 180, 180)
+ORANGE = (255, 165, 0)
+PURPLE = (160, 32, 240)
 
-# Directions
-UP = (0, -1)
-DOWN = (0, 1)
-LEFT = (-1, 0)
-RIGHT = (1, 0)
+# Font
+font = pygame.font.Font(None, 36)
+big_font = pygame.font.Font(None, 72)
 
-# --- Helper functions ---
-def place_food(exclude_positions):
-    """Place food at a random grid cell not in exclude_positions."""
-    while True:
-        x = random.randrange(0, GRID_WIDTH)
-        y = random.randrange(0, GRID_HEIGHT)
-        if (x, y) not in exclude_positions:
-            return (x, y)
+# Clock
+clock = pygame.time.Clock()
 
-def rect_from_cell(cell):
-    """Return a pygame.Rect for a given cell (x, y)."""
-    x, y = cell
-    return pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+# Road lines for menu animation
+menu_lines = [i for i in range(0, HEIGHT, 40)]
+line_speed = 5
 
-# --- Game classes ---
-class Snake:
-    def __init__(self, body, direction, color, name="Player"):
-        self.body = body[:]  # list of (x, y) tuples, head = body[0]
-        self.direction = direction
-        self.next_direction = direction
-        self.grow_pending = 0
-        self.color = color
-        self.alive = True
-        self.name = name
+# Default car settings
+car_color = BLUE
+car_shape = "rectangle"  # Options: rectangle, triangle, circle
 
-    def head(self):
-        return self.body[0]
+# --- Helper Functions ---
+def draw_text(text, color, x, y, font_used=font):
+    screen.blit(font_used.render(text, True, color), (x, y))
 
-    def set_direction(self, d):
-        # Prevent reversing directly
-        if (d[0] == -self.direction[0] and d[1] == -self.direction[1]) and len(self.body) > 1:
-            return
-        self.next_direction = d
+def button(text, x, y, w, h, inactive_color, active_color, action=None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    rect = pygame.Rect(x, y, w, h)
 
-    def update(self):
-        if not self.alive:
-            return
-        self.direction = self.next_direction
-        hx, hy = self.head()
-        nx, ny = hx + self.direction[0], hy + self.direction[1]
-        new_head = (nx, ny)
-        self.body.insert(0, new_head)
-        if self.grow_pending > 0:
-            self.grow_pending -= 1
-        else:
-            self.body.pop()
+    if rect.collidepoint(mouse):
+        pygame.draw.rect(screen, active_color, rect)
+        if click[0] == 1 and action is not None:
+            action()
+    else:
+        pygame.draw.rect(screen, inactive_color, rect)
 
-    def grow(self, amount=1):
-        self.grow_pending += amount
+    draw_text(text, BLACK, x + w // 4, y + 10)
 
-    def collides_with_cell(self, cell):
-        return cell in self.body
+def animate_menu_lines():
+    global menu_lines
+    for i in range(len(menu_lines)):
+        menu_lines[i] += line_speed
+        if menu_lines[i] > HEIGHT:
+            menu_lines[i] = -20
+        pygame.draw.rect(screen, WHITE, (WIDTH//2 - 2, menu_lines[i], 4, 20))
 
-    def collides_with_self(self):
-        return self.head() in self.body[1:]
+# --- Menus ---
+def main_menu():
+    menu = True
+    while menu:
+        screen.fill(GRAY)
+        animate_menu_lines()
+        draw_text("CAR GAME", YELLOW, WIDTH // 2 - 100, HEIGHT // 3, big_font)
 
-    def collides_with_wall(self):
-        x, y = self.head()
-        return not (0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT)
+        button("PLAY", WIDTH // 2 - 75, HEIGHT // 2, 150, 50, GREEN, LIGHT_GREEN, game_loop)
+        button("SETTINGS", WIDTH // 2 - 75, HEIGHT // 2 + 80, 150, 50, LIGHT_GRAY, WHITE, settings_menu)
+        button("QUIT", WIDTH // 2 - 75, HEIGHT // 2 + 160, 150, 50, RED, (255, 100, 100), quit_game)
 
-    def kill(self):
-        self.alive = False
-
-# --- Game initialization ---
-def new_game():
-    # Player 1 starts left middle, moving right
-    p1_start = [(5, GRID_HEIGHT//2), (4, GRID_HEIGHT//2), (3, GRID_HEIGHT//2)]
-    p1 = Snake(p1_start, RIGHT, P1_COLOR, "Player 1")
-
-    # Player 2 starts right middle, moving left
-    p2_start = [(GRID_WIDTH - 6, GRID_HEIGHT//2), (GRID_WIDTH - 5, GRID_HEIGHT//2), (GRID_WIDTH - 4, GRID_HEIGHT//2)]
-    p2 = Snake(p2_start, LEFT, P2_COLOR, "Player 2")
-
-    exclude = set(p1.body + p2.body)
-    food = place_food(exclude)
-
-    return p1, p2, food
-
-# --- Main ---
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("1v1 Snake")
-    clock = pygame.time.Clock()
-    font = pygame.font.SysFont(None, 28)
-    big_font = pygame.font.SysFont(None, 48)
-
-    p1, p2, food = new_game()
-    running = True
-    paused = False
-    winner_text = None
-
-    while running:
-        # --- Input ---
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                break
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                    break
-                if event.key == pygame.K_r:
-                    p1, p2, food = new_game()
-                    winner_text = None
-                    paused = False
-                # Player 1 controls
-                if event.key == pygame.K_w:
-                    p1.set_direction(UP)
-                elif event.key == pygame.K_s:
-                    p1.set_direction(DOWN)
-                elif event.key == pygame.K_a:
-                    p1.set_direction(LEFT)
-                elif event.key == pygame.K_d:
-                    p1.set_direction(RIGHT)
-                # Player 2 controls
-                elif event.key == pygame.K_UP:
-                    p2.set_direction(UP)
-                elif event.key == pygame.K_DOWN:
-                    p2.set_direction(DOWN)
-                elif event.key == pygame.K_LEFT:
-                    p2.set_direction(LEFT)
-                elif event.key == pygame.K_RIGHT:
-                    p2.set_direction(RIGHT)
-
-        if not running:
-            break
-
-        if not paused and (p1.alive or p2.alive):
-            # --- Update game state ---
-            p1.update()
-            p2.update()
-
-            # Check wall collisions
-            if p1.collides_with_wall():
-                p1.kill()
-            if p2.collides_with_wall():
-                p2.kill()
-
-            # Build set of occupied cells for collision checks
-            p1_body_set = set(p1.body)
-            p2_body_set = set(p2.body)
-
-            # Check self-collisions
-            if p1.collides_with_self():
-                p1.kill()
-            if p2.collides_with_self():
-                p2.kill()
-
-            # Check head-to-body collisions (hitboxes)
-            # If P1's head overlaps any cell in P2's body -> P1 dies
-            if p1.head() in p2_body_set:
-                p1.kill()
-            # If P2's head overlaps any cell in P1's body -> P2 dies
-            if p2.head() in p1_body_set:
-                p2.kill()
-
-            # Check head-to-head collision: both die
-            if p1.head() == p2.head():
-                p1.kill()
-                p2.kill()
-
-            # Food consumption: if a head lands on food, grow and respawn food
-            # Note: If both land on the same food simultaneously, both grow and new food spawns
-            consumed = False
-            exclude = set(p1.body + p2.body)
-            if p1.alive and p1.head() == food:
-                p1.grow(2)
-                consumed = True
-            if p2.alive and p2.head() == food:
-                p2.grow(2)
-                consumed = True
-            if consumed:
-                food = place_food(exclude)
-
-            # Determine if game ended
-            if not p1.alive and not p2.alive:
-                winner_text = "Tie!"
-                paused = True
-            elif not p1.alive:
-                winner_text = "Player 2 wins!"
-                paused = True
-            elif not p2.alive:
-                winner_text = "Player 1 wins!"
-                paused = True
-
-        # --- Draw ---
-        screen.fill(BLACK)
-
-        # Draw grid (subtle)
-        for x in range(0, SCREEN_WIDTH, CELL_SIZE):
-            pygame.draw.line(screen, GRID_COLOR, (x, 0), (x, SCREEN_HEIGHT))
-        for y in range(0, SCREEN_HEIGHT, CELL_SIZE):
-            pygame.draw.line(screen, GRID_COLOR, (0, y), (SCREEN_WIDTH, y))
-
-        # Draw food
-        pygame.draw.rect(screen, FOOD_COLOR, rect_from_cell(food))
-
-        # Draw snakes as rectangles with small inner spacing to create hitbox feel
-        for idx, seg in enumerate(p1.body):
-            r = rect_from_cell(seg).inflate(-2, -2)
-            pygame.draw.rect(screen, p1.color, r)
-            # head highlight
-            if idx == 0:
-                pygame.draw.rect(screen, WHITE, r, 2)
-        for idx, seg in enumerate(p2.body):
-            r = rect_from_cell(seg).inflate(-2, -2)
-            pygame.draw.rect(screen, p2.color, r)
-            if idx == 0:
-                pygame.draw.rect(screen, WHITE, r, 2)
-
-        # Draw scores (length)
-        p1_score_text = font.render(f"Player 1: {len(p1.body)}", True, SCORE_COLOR)
-        p2_score_text = font.render(f"Player 2: {len(p2.body)}", True, SCORE_COLOR)
-        screen.blit(p1_score_text, (8, 8))
-        screen.blit(p2_score_text, (SCREEN_WIDTH - p2_score_text.get_width() - 8, 8))
-
-        # Draw controls reminder
-        hint = font.render("WASD / Arrows. R to restart.", True, SCORE_COLOR)
-        screen.blit(hint, ((SCREEN_WIDTH - hint.get_width())//2, 8))
-
-        # Winner message
-        if winner_text:
-            wrap = big_font.render(winner_text, True, SCORE_COLOR)
-            screen.blit(wrap, ((SCREEN_WIDTH - wrap.get_width())//2, (SCREEN_HEIGHT - wrap.get_height())//2))
-
-            sub = font.render("Press R to play again", True, SCORE_COLOR)
-            screen.blit(sub, ((SCREEN_WIDTH - sub.get_width())//2, (SCREEN_HEIGHT - wrap.get_height())//2 + 60))
+                quit_game()
 
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(60)
 
+def settings_menu():
+    global car_color, car_shape
+    menu = True
+    while menu:
+        screen.fill(GRAY)
+        animate_menu_lines()
+        draw_text("SETTINGS", YELLOW, WIDTH // 2 - 90, HEIGHT // 5, big_font)
+
+        # Color options
+        button("BLUE", 50, 250, 100, 50, BLUE, LIGHT_GREEN, lambda: set_car_color(BLUE))
+        button("RED", 250, 250, 100, 50, RED, LIGHT_GREEN, lambda: set_car_color(RED))
+        button("GREEN", 50, 350, 100, 50, GREEN, LIGHT_GREEN, lambda: set_car_color(GREEN))
+        button("PURPLE", 250, 350, 100, 50, PURPLE, LIGHT_GREEN, lambda: set_car_color(PURPLE))
+        button("ORANGE", 150, 450, 100, 50, ORANGE, LIGHT_GREEN, lambda: set_car_color(ORANGE))
+
+        # Car shape options
+        draw_text("CAR SHAPE:", WHITE, 50, 520)
+        button("RECT", 50, 550, 80, 40, LIGHT_GRAY, WHITE, lambda: set_car_shape("rectangle"))
+        button("TRIANGLE", 150, 550, 100, 40, LIGHT_GRAY, WHITE, lambda: set_car_shape("triangle"))
+        button("CIRCLE", 270, 550, 80, 40, LIGHT_GRAY, WHITE, lambda: set_car_shape("circle"))
+
+        # Back to main menu
+        button("BACK", WIDTH // 2 - 75, HEIGHT - 80, 150, 50, LIGHT_GRAY, WHITE, main_menu)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+
+        pygame.display.flip()
+        clock.tick(60)
+
+# --- Settings Functions ---
+def set_car_color(color):
+    global car_color
+    car_color = color
+
+def set_car_shape(shape):
+    global car_shape
+    car_shape = shape
+
+# --- Game Functions ---
+def quit_game():
     pygame.quit()
     sys.exit()
 
-if __name__ == "__main__":
-    main()
+def draw_player_car(x, y):
+    if car_shape == "rectangle":
+        pygame.draw.rect(screen, car_color, (x, y, 50, 80))
+    elif car_shape == "triangle":
+        pygame.draw.polygon(screen, car_color, [(x+25, y), (x, y+80), (x+50, y+80)])
+    elif car_shape == "circle":
+        pygame.draw.ellipse(screen, car_color, (x, y, 50, 80))
+
+def game_loop():
+    car_w, car_h = 50, 80
+    car_x = WIDTH // 2 - car_w // 2
+    car_y = HEIGHT - car_h - 10
+    car_speed = 6
+
+    enemy_w, enemy_h = 50, 80
+    enemy_x = random.randint(0, WIDTH - enemy_w)
+    enemy_y = -enemy_h
+    enemy_speed = 5
+
+    score = 0
+    running = True
+    game_over = False
+
+    while running:
+        clock.tick(60)
+        screen.fill(GRAY)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+
+        keys = pygame.key.get_pressed()
+        if not game_over:
+            if keys[pygame.K_a] and car_x > 0:
+                car_x -= car_speed
+            elif keys[pygame.K_d] and car_x < WIDTH - car_w:
+                car_x += car_speed
+
+            # Move enemy
+            enemy_y += enemy_speed
+            if enemy_y > HEIGHT:
+                enemy_y = -enemy_h
+                enemy_x = random.randint(0, WIDTH - enemy_w)
+                score += 1
+                enemy_speed += 0.25
+
+            # Draw cars
+            draw_player_car(car_x, car_y)
+            pygame.draw.rect(screen, RED, (enemy_x, enemy_y, enemy_w, enemy_h))
+
+            # Collision
+            player_rect = pygame.Rect(car_x, car_y, car_w, car_h)
+            enemy_rect = pygame.Rect(enemy_x, enemy_y, enemy_w, enemy_h)
+            if player_rect.colliderect(enemy_rect):
+                game_over = True
+
+            # Road lines + score
+            for i in range(0, HEIGHT, 40):
+                pygame.draw.rect(screen, WHITE, (WIDTH // 2 - 2, i, 4, 20))
+            draw_text(f"Score: {score}", WHITE, 10, 10)
+
+        else:
+            draw_text("GAME OVER", RED, WIDTH // 3 - 20, HEIGHT // 2 - 80, big_font)
+            button("RESTART", WIDTH // 2 - 75, HEIGHT // 2, 150, 50, GREEN, LIGHT_GREEN, game_loop)
+            button("MENU", WIDTH // 2 - 75, HEIGHT // 2 + 80, 150, 50, YELLOW, (255, 255, 150), main_menu)
+
+        pygame.display.flip()
+
+# --- Start game at main menu ---
+main_menu()
