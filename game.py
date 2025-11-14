@@ -198,3 +198,4 @@ def game_loop():
 
 # --- Start game at main menu ---
 main_menu()
+enemy_speed = random.randint(20, 50)
