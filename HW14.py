@@ -33,9 +33,37 @@ evenNumbers =[]
 oddNumbers = []
 #8. Make a loop that counts the number of even and odd numbers in the list, and prints the
 #result after the loop.
-
+my_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+even_count = 0
+odd_count = 0
+for number in my_list:
+    if number % 2 == 0:
+        even_count += 1
+    else:
+        odd_count += 1
+print(f"Number of even numbers: {even_count}")
+print(f"Number of odd numbers: {odd_count}")
 #9. Create a variable that asks the user for an integer and an empty integer variable.
+user_integer = int(input("Please enter an integer: "))
 
+empty_integer_none = None  # Represents no value
+empty_integer_zero = 0     # Represents an integer with value 0
 #10. Create a loop with a range from 1 to the number the user input. Use the loop to find the
 #factorial of that number and print the result. A factorial of a number is that number multiplied
 #by every number before it until you reach 1. (For example: 5! is 5 x 4 x 3 x 2 x 1 = 120)
+try:
+    num = int(input("Enter a non-negative integer: "))
+except ValueError:
+    print("Invalid input. Please enter an integer.")
+    exit()
+
+if num < 0:
+    print("Factorial is not defined for negative numbers.")
+elif num == 0:
+    print("The factorial of 0 is 1.")
+else:
+    factorial = 1
+    # Loop from 1 up to the entered number (inclusive)
+    for i in range(1, num + 1):
+        factorial *= i
+    print(f"The factorial of {num} is {factorial}.")
