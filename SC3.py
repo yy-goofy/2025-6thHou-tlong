@@ -13,7 +13,6 @@ players = int(input("how many players? : "))
 total = 0
 for x in range(players):
     rating = int(input("Enter rating : "))
-    total += rating
     while rating > 5 or rating < 1:
         print("not a valid rating")
         rating = int(input("Enter rating : "))
