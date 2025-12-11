@@ -46,4 +46,4 @@ while number != 0:
         print("Invalid input. Please enter an integer.")
 
 print("You entered 0. The loop has terminated.")
-print(hello world)
+print("hello world")
