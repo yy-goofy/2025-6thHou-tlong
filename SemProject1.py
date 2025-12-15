@@ -9,6 +9,7 @@
 #characters and some of the enemies they may face, and are tasked with making an early prototype
 #of one of the party members fighting against an enemy until one of them hits zero HP (dies).
 import random
+
 partyDict = { "LaeZel" : {
         "HO" : 48,
         "Init" : 1,
@@ -97,35 +98,9 @@ enemyDict = { "Goblin" : {
 
 
 #5. Repeat steps 2-5 until one of the characters is dead.
-
-Shadow_heart_hp = 100
-Dragon_hp = 100
-player1_turn = True
+Shadowheart = 100
+dragon = 100
+shadowheart_turn = True
 game_running = True
-print("Welcome to the 1v1 DND game")
-print("Shadow_heart HP: [100] | Dragon HP: [100]\n")
-while game_running:
-    if player1_turn:
-        input("Shadow_heart, press Enter to roll a d20...")
-        roll = random.randint(1, 20)
-        damage = roll  # Simple damage model: roll equals damage dealt
-        print(f"Shadow_heart rolled a {roll} and deals {damage} damage!")
-        Dragon_hp -= damage
-        print(f"Dragon now has {Dragon_hp} HP remaining.\n")
-        if Dragon_hp <= 0:
-            print("Dragon has been defeated! Shadow_heart wins!")
-            game_running = False
-        else:
-            player1_turn = False
-    elif not player1_turn:
-        input("Dragon, press Enter to roll a d20...")
-        roll = random.randint(1, 20)
-        damage = roll
-        print(f"Dragon has rolled a {roll} and deals {damage} damage!")
-        Shadow_heart_hp -= damage
-        print(f"Shadow_heart now has {Shadow_heart_hp} HP remaining.\n")
-        if Shadow_heart_hp <= 0:
-            print("Player 1 has been defeated Player 2 wins")
-            game_running = False
-        else:
-            player1_turn = True
+print("welcome to the game")
+print("Shadowheart HP: [100] | dragon HP: [100]\n")
