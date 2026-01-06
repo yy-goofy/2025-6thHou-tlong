@@ -98,9 +98,11 @@ enemyDict = { "Goblin" : {
 
 
 #5. Repeat steps 2-5 until one of the characters is dead.
+"""
 Shadowheart = 100
 dragon = 100
 shadowheart_turn = True
 game_running = True
 print("welcome to the game")
 print("Shadowheart HP: [100] | dragon HP: [100]\n")
+"""
