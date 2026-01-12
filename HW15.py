@@ -17,6 +17,7 @@ m = A
 print(round(m))
 #6. Create a list of five different random integers between 1 and 10.
 int_list = [2, 4, 6 ,8, 1]
+random.randint(int_list)
 #7. Print the 4th number in the list.
 print(8)
 #8. Append another integer to the end of the list, also random from 1 to 10.
@@ -25,12 +26,12 @@ print(int_list)
 #9. Sort the list from lowest to highest and then print the 4th number in the list again.
 int_list.sort()
 print(int_list)
-print(int_list[0])
+print(int_list[3])
 #10. Create a while loop that starts at 1, prints i and then adds i to itself until it is greater than 100.
 i = 1
 while i <= 100:
     print(i)
-    i += 1
+    i += i
 #11. Create a list containing the names of five other students in the classroom.
 class_list = ["Cash", "Alaya", "Tristan", "Devon", "ally"]
 #12. Create a for loop that individually prints out the names of each student in the list.
