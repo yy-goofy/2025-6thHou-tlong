@@ -27,7 +27,6 @@ int_list.sort()
 print(int_list)
 print(int_list[0])
 #10. Create a while loop that starts at 1, prints i and then adds i to itself until it is greater than 100.
-import time
 i = 1
 while i <= 100:
     print(i)
@@ -42,6 +41,6 @@ i = 1
 while i <= 100:
     print(i)
     i += 1
-    if i * 10 == 0:
-        continue
+    if 10 == i:
+        break
 #14. Free space. Do something creative. :)
