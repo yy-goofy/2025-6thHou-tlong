@@ -31,3 +31,4 @@ def random_number():
     return random.randint(1, 5)
 print(random_number())
 #8. Print the new value of x.
+print(x)
