@@ -1,4 +1,4 @@
-#Name:
+#Name:tristan long
 #Class: 6th Hour
 #Assignment: HW16
 import random
@@ -7,9 +7,9 @@ def hello_world():
     print("Hello World!")
 hello_world()
 #2. Create a def function that calculates the average of three numbers (set the 3 numbers as your arguments).
-def addition(a, b, c):
+def addition(a,b,c):
     d = (a+b+c)/3
-    print(a, b , c)
+    print(a,b,c)
     print(d)
 #3. Create a def function with the names of 5 animals as arguments, treats it like a list, and
 #prints the name of the third animal.
@@ -20,9 +20,7 @@ def loop(number):
     for i in range(number):
         loop(i)
 #5. Call all the functions created in 1 - 4 with relevant arguments.
-hello_world()
-addition(1, 2, 3)
-animals("dog", "cat", "mouse, frog, lion, snake")
+
 #6. Create a variable x that has the value of 2. Print x
 x = 2
 print(x)

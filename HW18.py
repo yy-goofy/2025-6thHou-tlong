@@ -1,4 +1,4 @@
-#Name:
+#Name:tristan long
 #Class: 6th Hour
 #Assignment: HW18
 from random import random
