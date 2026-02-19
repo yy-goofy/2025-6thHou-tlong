@@ -31,4 +31,4 @@ try :
     Smartphone = item.weight(7)
     print(Smartphone.weight)
 except :
-    print("weight")
+    print("error")
