@@ -12,7 +12,7 @@ class warrior:
         self.damage = damage
         self.speed = speed
     def warrior_loop(self):
-        for x in range(10):
+        while x in range(10):
             warrior.health = warrior.health + random.randint(1,6)
             print('the warrior new health is', warrior.health)
             time.sleep(1)
