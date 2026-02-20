@@ -1,4 +1,4 @@
-#Name: Coach Mack
+#Name: Tristan long
 #Class: 6th Hour
 #Assignment: HW20
 
