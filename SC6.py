@@ -1,0 +1,85 @@
+#Name:Tristan long
+#Class: 6th Hour
+#Assignment: SC6
+
+import random
+
+#With a fresh perspective, the team lead wants you to look back and refactor the old combat code to
+#be streamlined with classes so the character and enemy stats won't be built in bulky dictionaries anymore.
+
+#(Translation: Rebuild Semester Project 1 using classes instead of dictionaries, include and refactor
+#the combat test code below as well.)
+class Character:
+    def __init__(self, n, hp, ap):
+        self.n, self.hp, self.ap = n, hp, ap
+    def attack(self, e):
+        d = random.randint(0, self.ap)
+        e.hp = max(e.hp - d, 0)
+        print(f"{self.n} attacks {e.n} for {d}")
+    def alive(self):
+        return self.hp > 0
+    def __str__(self):
+        return f"{self.n}: {self.hp} HP"
+
+class Enemy:
+    def __init__(self, n, hp, ap):
+        self.n, self.hp, self.ap = n, hp, ap
+    def attack(self, c):
+        d = random.randint(0, self.ap)
+        c.hp = max(c.hp - d, 0)
+        print(f"{self.n} attacks {c.n} for {d}")
+    def alive(self):
+        return self.hp > 0
+    def __str__(self):
+        return f"{self.n}: {self.hp} HP"
+
+def combat_round(p, e):
+    if p.alive() and e.alive():
+        p.attack(e)
+        if e.alive():
+            e.attack(p)
+        print(p)
+        print(e)
+    else:
+        print(f"{'Defeated' if not p.alive() else ''} {p.n}")
+        print(f"{'Defeated' if not e.alive() else ''} {e.n}")
+
+p = Character("Hero", 100, 20)
+e = Enemy("Goblin", 50, 10)
+
+while p.alive() and e.alive():
+    combat_round(p, e)
+
+
+enemies = {
+    "Goblin": {
+        "health": 30,
+        "damage": 5,
+        "armor": 2,
+        "type": "ground"
+    },
+    "Orc": {
+        "health": 60,
+        "damage": 10,
+        "armor": 5,
+        "type": "ground"
+    },
+    "Troll": {
+        "health": 100,
+        "damage": 15,
+        "armor": 8,
+        "type": "ground"
+    },
+    "Harpy": {
+        "health": 40,
+        "damage": 7,
+        "armor": 1,
+        "type": "flying"
+    },
+    "Dragon": {
+        "health": 200,
+        "damage": 25,
+        "armor": 12,
+        "type": "flying"
+    }
+}
