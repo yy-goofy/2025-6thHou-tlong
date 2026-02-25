@@ -30,7 +30,7 @@ healer = warrior(60, 10, 30)
 #that sets the warrior's health to its max (100) if the healing would bring the warrior's health above that.
 #Call the function to the healer.
 def healer_warrior():
-    for x in range(10):
+    for x in range(30):
         warrior.health = healer.health + random.randint(1,30)
 #7. Print the warrior's final health at the very bottom.
 print(warrior.health)
